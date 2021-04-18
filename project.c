@@ -18,7 +18,7 @@
 #include <unistd.h>
 #include <linux/joystick.h>
 #include <wiringPi.h>
-//void gpioInit();
+
 void led_modify(int *gpioOut, int numGPIOs, int numLEDs);
 void gpioInit(int *gpioOut, int numGPIOs);
 #define GPIO2 8
@@ -58,7 +58,7 @@ size_t get_axis_count(int fd)
     __u8 axes;
 
     if (ioctl(fd, JSIOCGAXES, &axes) == -1)
-        return 0;
+	return 0;
 
     return axes;
 }
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     struct axis_state axes[3] = {0};
     size_t axis;
 	int axis_coords[2] = {0};
-	int curr_axis = 1;
+	int curr_axis = 0;
 
     device = "/dev/input/js0";
     js = open(device, O_RDONLY);
@@ -125,11 +125,20 @@ int main(int argc, char *argv[])
 
 	int gpioOut[8] = {GPIO2, GPIO3, GPIO4, GPIO17, GPIO27, GPIO22, GPIO10, GPIO9};
 	gpioInit(gpioOut, 8);
-
-
+	int loopbreak = 0;	
+	do{
+		read_event(js, &event);
+		if(event.type == JS_EVENT_BUTTON)
+			if(event.number == 7)
+				loopbreak = 1;
+	}
+	while(!loopbreak);
+	
+	
     /* This loop will exit if the controller is unplugged. */
     while (read_event(js, &event) == 0)
     {
+
         switch (event.type)
         {
             case JS_EVENT_BUTTON:
