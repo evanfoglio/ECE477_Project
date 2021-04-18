@@ -29,7 +29,6 @@ void gpioInit(int *gpioOut, int numGPIOs);
 #define GPIO22 3
 #define GPIO10 12
 #define GPIO9 13
-//#define GPIO27 2
 
 
 
@@ -114,13 +113,14 @@ int main(int argc, char *argv[])
     struct js_event event;
     struct axis_state axes[3] = {0};
     size_t axis;
+	int axis_coords[2] = {0};
+	int curr_axis = 1;
 
     device = "/dev/input/js0";
     js = open(device, O_RDONLY);
 
 	if (js == -1)
         	perror("Could not open joystick");
-
 
 
 	int gpioOut[8] = {GPIO2, GPIO3, GPIO4, GPIO17, GPIO27, GPIO22, GPIO10, GPIO9};
@@ -133,65 +133,83 @@ int main(int argc, char *argv[])
         switch (event.type)
         {
             case JS_EVENT_BUTTON:
-                printf("Button %u %s\n", event.number, event.value ? "pressed" : "released");
-                break;
-/*		switch(event.number)
+		switch(event.number)//Buttons
 		{
-			case 0:
-					digitalWrite(GPIO2, event.value);
+			case 0://A
+					
 					break;
-			case 1:
-					digitalWrite(GPIO3, event.value);
+			case 1://B
+					
 					break;
-			case 2:
-		                        digitalWrite(GPIO4, event.value);
+			case 2://X
+		                        
                                         break;
-			case 3:	
-                                        digitalWrite(GPIO17, event.value);
+			case 3://Y
+                                        
                                         break;
+                        case 4://LB
+                                        curr_axis = 0;
+                                        break;
+                        case 5://RB
+                                        curr_axis = 1;
+                                        break;
+                        case 6://SELECT
+                                        
+                                        break;
+                        case 7://START
+                                        
+                                        break;
+                        case 8://XBOX
+                                        
+                                        break;
+                        case 9://LS
+                                        
+                                        break;
+                        case 10://RS
+                                        
+                                        break;
+
 			default:
-				printf("Not Right Button\n");
+				printf("Button not Supported\n");
 				break;
 		}
-		break;*/
-            case JS_EVENT_AXIS:
-			axis = get_axis_state(&event, axes);
-                	if ((axis < 3)){
-                   		//printf("Axis %zu at (%6d, %6d)\n", axis, axes[axis].x, axes[axis].y);
-                		if(axis == 2){
-					if(axes[axis].y == -32767)
-						led_modify(gpioOut, 8, 0);
-					else 
-					if(axes[axis].y < -24767)
-						led_modify(gpioOut, 8, 1);
-					else
-					if(axes[axis].y < -16767)
-						led_modify(gpioOut, 8, 2);
-					else
-					if(axes[axis].y < -8767)
-						led_modify(gpioOut, 8, 3);
-					else
-					if(axes[axis].y < 0)
-						led_modify(gpioOut, 8, 4);
-					else
-					if(axes[axis].y < 8767)
-						led_modify(gpioOut, 8, 5);
-					else
-					if(axes[axis].y < 16767)
-						led_modify(gpioOut, 8, 6);
-					else
-					if(axes[axis].y < 24767)
-						led_modify(gpioOut, 8, 7);
-					else
-					if(axes[axis].y == 32767)
-						led_modify(gpioOut, 8, 8);
-					
-				}
-				
-
-
-			}
 		break;
+            case JS_EVENT_AXIS: 
+
+                        axis = get_axis_state(&event, axes);
+                        axis_coords[0] = axes[axis].x;
+                        axis_coords[1] = axes[axis].y;
+                        if ((axis < 3)){
+                                if(((axis == 2) && curr_axis) || ((axis == 1) && !curr_axis)){
+                                        if(axis_coords[curr_axis] == -32767)
+                                                led_modify(gpioOut, 8, 0);
+                                        else
+                                        if(axis_coords[curr_axis] < -24767)
+                                                led_modify(gpioOut, 8, 1);
+                                        else
+                                        if(axis_coords[curr_axis] < -16767)
+                                                led_modify(gpioOut, 8, 2);
+                                        else
+                                        if(axis_coords[curr_axis] < -8767)
+                                                led_modify(gpioOut, 8, 3);
+                                        else
+                                        if(axis_coords[curr_axis] < 0)
+                                                led_modify(gpioOut, 8, 4);
+                                        else
+                                        if(axis_coords[curr_axis] < 8767)
+                                                led_modify(gpioOut, 8, 5);
+                                        else
+                                        if(axis_coords[curr_axis] < 16767)
+                                                led_modify(gpioOut, 8, 6);
+                                        else
+                                        if(axis_coords[curr_axis] < 24767)
+                                                led_modify(gpioOut, 8, 7);
+                                        else
+                                        if(axis_coords[curr_axis] == 32767)
+                                                led_modify(gpioOut, 8, 8);
+                                }
+                        }
+                break;
             default:
                 /* Ignore init events. */
                 break;
@@ -212,7 +230,6 @@ void gpioInit(int *gpioOut, int numGPIOs)
         wiringPiSetup();
         for(i = numGPIOs; i >= 0; i--){
                 pinMode(gpioOut[i], OUTPUT);
-//		digitalWrite(gpioOut[i], 1);
         }
 }
 
