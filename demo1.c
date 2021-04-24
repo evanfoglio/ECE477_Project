@@ -1,18 +1,20 @@
+/*Authors
+*
+* Evan Foglio
+* Richard Mann
+* Evan Foglio
+* */
+
+
 /**
- * Author: Jason White
- *
- * Description:
- * Reads joystick/gamepad events and displays them.
- *
- * Compile:
- * gcc joystick.c -o joystick
- *
- * Run:
- * ./joystick [/dev/input/jsX]
- *
- * See also:
- * https://www.kernel.org/doc/Documentation/input/joystick-api.txt
- */
+* Author Jason White wrote;
+* get_axis_count(int fd)
+* get_button_count(int fd)
+* read_event()
+* axis_state
+* get_axis_state()
+*
+*/
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -182,48 +184,10 @@ int main(int argc, char *argv[])
 				break;
 		}
 		break;
-            case JS_EVENT_AXIS: 
-
- /*                       axis = get_axis_state(&event, axes);
-                        axis_coords[0] = axes[axis].x;
-                        axis_coords[1] = axes[axis].y;
-                        if ((axis < 3)){
-                                if(((axis == 2) && curr_axis) || ((axis == 1) && !curr_axis)){
-                                        if(axis_coords[curr_axis] == -32767)
-                                                led_modify(gpioOut, 8, 0);
-                                        else
-                                        if(axis_coords[curr_axis] < -24767)
-                                                led_modify(gpioOut, 8, 1);
-                                        else
-                                        if(axis_coords[curr_axis] < -16767)
-                                                led_modify(gpioOut, 8, 2);
-                                        else
-                                        if(axis_coords[curr_axis] < -8767)
-                                                led_modify(gpioOut, 8, 3);
-                                        else
-                                        if(axis_coords[curr_axis] < 0)
-                                                led_modify(gpioOut, 8, 4);
-                                        else
-                                        if(axis_coords[curr_axis] < 8767)
-                                                led_modify(gpioOut, 8, 5);
-                                        else
-                                        if(axis_coords[curr_axis] < 16767)
-                                                led_modify(gpioOut, 8, 6);
-                                        else
-                                        if(axis_coords[curr_axis] < 24767)
-                                                led_modify(gpioOut, 8, 7);
-                                        else
-                                        if(axis_coords[curr_axis] == 32767)
-                                                led_modify(gpioOut, 8, 8);
-                                }
-                        }
-*/
-                break;
             default:
                 /* Ignore init events. */
                 break;
         }
-        
         fflush(stdout);
     }
 
@@ -242,6 +206,7 @@ void gpioInit(int *gpioOut, int numGPIOs)
         }
 }
 
+//Modifies LEDs based on passed value
 void led_modify(int *gpioOut, int numGPIOs, int numLEDs)
 {
 

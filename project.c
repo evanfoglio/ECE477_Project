@@ -1,18 +1,21 @@
+/*Authors
+* 
+*
+* Evan Foglio
+* Richard Mann
+* Evan Foglio
+* */
+
+
 /**
- * Author: Jason White
- *
- * Description:
- * Reads joystick/gamepad events and displays them.
- *
- * Compile:
- * gcc joystick.c -o joystick
- *
- * Run:
- * ./joystick [/dev/input/jsX]
- *
- * See also:
- * https://www.kernel.org/doc/Documentation/input/joystick-api.txt
- */
+* Author Jason White wrote;
+* get_axis_count(int fd)
+* get_button_count(int fd)
+* read_event()
+* axis_state
+* get_axis_state()
+*
+*/
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -116,6 +119,7 @@ int main(int argc, char *argv[])
 	int axis_coords[2] = {0};
 	int curr_axis = 0;
 
+    //Open device
     device = "/dev/input/js0";
     js = open(device, O_RDONLY);
 
@@ -126,6 +130,7 @@ int main(int argc, char *argv[])
 	int gpioOut[8] = {GPIO2, GPIO3, GPIO4, GPIO17, GPIO27, GPIO22, GPIO10, GPIO9};
 	gpioInit(gpioOut, 8);
 	int loopbreak = 0;	
+	//Wait until start is pushed
 	do{
 		read_event(js, &event);
 		if(event.type == JS_EVENT_BUTTON)
@@ -141,6 +146,7 @@ int main(int argc, char *argv[])
 
         switch (event.type)
         {
+	    //Read buttons
             case JS_EVENT_BUTTON:
 		switch(event.number)//Buttons
 		{
@@ -183,8 +189,9 @@ int main(int argc, char *argv[])
 				break;
 		}
 		break;
-            case JS_EVENT_AXIS: 
-
+            //Read axis
+	    case JS_EVENT_AXIS: 
+			//Assign x and y
                         axis = get_axis_state(&event, axes);
                         axis_coords[0] = axes[axis].x;
                         axis_coords[1] = axes[axis].y;
@@ -241,7 +248,7 @@ void gpioInit(int *gpioOut, int numGPIOs)
                 pinMode(gpioOut[i], OUTPUT);
         }
 }
-
+//Set LEDs based on value passed
 void led_modify(int *gpioOut, int numGPIOs, int numLEDs)
 {
 

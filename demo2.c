@@ -1,18 +1,20 @@
+/*Authors
+*
+* Evan Foglio
+* Richard Mann
+* Evan Foglio
+* */
+
+
 /**
- * Author: Jason White
- *
- * Description:
- * Reads joystick/gamepad events and displays them.
- *
- * Compile:
- * gcc joystick.c -o joystick
- *
- * Run:
- * ./joystick [/dev/input/jsX]
- *
- * See also:
- * https://www.kernel.org/doc/Documentation/input/joystick-api.txt
- */
+* Author Jason White wrote;
+* get_axis_count(int fd)
+* get_button_count(int fd)
+* read_event()
+* axis_state
+* get_axis_state()
+*
+*/
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -122,10 +124,12 @@ int main(int argc, char *argv[])
 	if (js == -1)
         	perror("Could not open joystick");
 
-
+	//Define
 	int gpioOut[8] = {GPIO2, GPIO3, GPIO4, GPIO17, GPIO27, GPIO22, GPIO10, GPIO9};
 	gpioInit(gpioOut, 8);
 	int loopbreak = 0;	
+	
+	//Wait for start
 	do{
 		read_event(js, &event);
 		if(event.type == JS_EVENT_BUTTON)
@@ -181,11 +185,16 @@ int main(int argc, char *argv[])
 				break;
 		}
 		break;
+
+	    //Find axis value
             case JS_EVENT_AXIS: 
 
+			//Get axis x and y
                         axis = get_axis_state(&event, axes);
                         axis_coords[0] = axes[axis].x;
                         axis_coords[1] = axes[axis].y;
+
+			//Set LEDs with axis value
                         if ((axis < 3)){
                                 if(((axis == 2) && curr_axis) || ((axis == 1) && !curr_axis)){
                                         if(axis_coords[curr_axis] == -32767)
@@ -240,6 +249,7 @@ void gpioInit(int *gpioOut, int numGPIOs)
         }
 }
 
+//Set LEDs based on passed value
 void led_modify(int *gpioOut, int numGPIOs, int numLEDs)
 {
 

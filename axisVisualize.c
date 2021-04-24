@@ -1,17 +1,19 @@
+/*Authors
+ * Evan Foglio
+ * Richard Mann
+ * Evan Foglio
+ * */
+
+
 /**
- * Author: Jason White
+ * Author Jason White wrote;
+ * get_axis_count(int fd)
+ * get_button_count(int fd)
+ * read_event()
+ * axis_state
+ * get_axis_state()
  *
- * Description:
- * Reads joystick/gamepad events and displays them.
- *
- * Compile:
- * gcc joystick.c -o joystick
- *
- * Run:
- * ./joystick [/dev/input/jsX]
- *
- * See also:
- * https://www.kernel.org/doc/Documentation/input/joystick-api.txt
+ * And provided use examples
  */
 #include <fcntl.h>
 #include <stdio.h>
@@ -29,7 +31,6 @@ void gpioInit(int *gpioOut, int numGPIOs);
 #define GPIO22 3
 #define GPIO10 12
 #define GPIO9 13
-//#define GPIO27 2
 
 
 
@@ -131,65 +132,11 @@ int main(int argc, char *argv[])
     while (read_event(js, &event) == 0)
     {
         switch (event.type)
-        {
-            case JS_EVENT_BUTTON:
-                //printf("Button %u %s\n", event.number, event.value ? "pressed" : "released");
-                break;
-/*		switch(event.number)
-		{
-			case 0:
-					digitalWrite(GPIO2, event.value);
-					break;
-			case 1:
-					digitalWrite(GPIO3, event.value);
-					break;
-			case 2:
-		                        digitalWrite(GPIO4, event.value);
-                                        break;
-			case 3:	
-                                        digitalWrite(GPIO17, event.value);
-                                        break;
-			default:
-				printf("Not Right Button\n");
-				break;
-		}
-		break;*/
+	{
             case JS_EVENT_AXIS:
 			axis = get_axis_state(&event, axes);
                 	if ((axis < 3)){
                    		printf("Axis %zu at (%6d, %6d)\n", axis, axes[axis].x, axes[axis].y);
-                		/*if(axis == 2){
-					if(axes[axis].y == -32767)
-						led_modify(gpioOut, 8, 0);
-					else 
-					if(axes[axis].y < -24767)
-						led_modify(gpioOut, 8, 1);
-					else
-					if(axes[axis].y < -16767)
-						led_modify(gpioOut, 8, 2);
-					else
-					if(axes[axis].y < -8767)
-						led_modify(gpioOut, 8, 3);
-					else
-					if(axes[axis].y < 0)
-						led_modify(gpioOut, 8, 4);
-					else
-					if(axes[axis].y < 8767)
-						led_modify(gpioOut, 8, 5);
-					else
-					if(axes[axis].y < 16767)
-						led_modify(gpioOut, 8, 6);
-					else
-					if(axes[axis].y < 24767)
-						led_modify(gpioOut, 8, 7);
-					else
-					if(axes[axis].y == 32767)
-						led_modify(gpioOut, 8, 8);
-					
-				}*/
-				
-
-
 			}
 		break;
             default:
@@ -212,10 +159,10 @@ void gpioInit(int *gpioOut, int numGPIOs)
         wiringPiSetup();
         for(i = numGPIOs; i >= 0; i--){
                 pinMode(gpioOut[i], OUTPUT);
-//		digitalWrite(gpioOut[i], 1);
         }
 }
 
+//Sets the passed number of LEDs to 1 and the rest to 0s
 void led_modify(int *gpioOut, int numGPIOs, int numLEDs)
 {
 
